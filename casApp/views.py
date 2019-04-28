@@ -37,7 +37,7 @@ def user(request):
 
 @csrf_exempt
 def login(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         try:
             body = json.loads(request.body.decode("utf-8"))
             mat = body['mat']
