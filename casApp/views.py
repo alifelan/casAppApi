@@ -22,13 +22,13 @@ def user(request):
             password = body['password']
             casa_name = body['casa']
         except KeyError:
-            return JsonResponse({'status': 'false', 'message': 'Missing fields'})
+            return JsonResponse({'status': 'false', 'message': 'Missing fields'}, status=400)
         try:
             casa = Casa.objects.get(name=casa_name)
         except Casa.DoesNotExist:
-            return JsonResponse({'status': 'false', 'message': 'Casa doesnt exist'})
+            return JsonResponse({'status': 'false', 'message': 'Casa doesnt exist'}, status=404)
         if len(User.objects.filter(mat=mat)) > 0:
-            return JsonResponse({'status': 'false', 'message': f'User with {mat} already exists. Use PUT to update'})
+            return JsonResponse({'status': 'false', 'message': f'User with {mat} already exists. Use PUT to update'}, status=405)
         user = User(name=name, mat=mat, password=password, casa=casa)
         user.save()
         serializer = UserSerializer(user)
@@ -43,11 +43,11 @@ def login(request):
             mat = body['mat']
             password = body['password']
         except KeyError:
-            return JsonResponse({'status': 'false', 'message': 'Missing fields'})
+            return JsonResponse({'status': 'false', 'message': 'Missing fields'}, status=400)
         try:
             user = User.objects.get(mat=mat, password=password)
         except User.DoesNotExist:
-            return JsonResponse({'status': 'false', 'message': 'User does not exist or wrong password'})
+            return JsonResponse({'status': 'false', 'message': 'User does not exist or wrong password'}, status=403)
         serializer = UserSerializer(user)
         return JsonResponse(serializer.data, safe=False)
 
