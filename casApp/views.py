@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators. csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from casApp.models import Casa, Event, Location, User
-from casApp.serializers import EventSerializer, LocationSerializer, EventSerializer, UserSerializer
+from casApp.serializers import EventSerializer, LocationSerializer, UserSerializer, CasaSerializer
 from datetime import datetime
 import json
 from django.utils import timezone
@@ -66,4 +66,12 @@ def get_locations(request):
     if request.method == 'GET':
         locations = Location.objects.all()
         serializer = LocationSerializer(locations, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+
+@csrf_exempt
+def get_casas(request):
+    if request.method == 'GET':
+        casas = Casa.objects.all()
+        serializer = CasaSerializer(casas, many=True)
         return JsonResponse(serializer.data, safe=False)

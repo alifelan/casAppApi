@@ -21,3 +21,9 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('id', 'name', 'maps', 'photo')
+
+
+class CasaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Casa
+        fields = '__all__'
