@@ -62,6 +62,14 @@ def get_events(request):
 
 
 @csrf_exempt
+def get_all_events(request):
+    if request.method == 'GET':
+        events = Event.objects.all()
+        serializer = EventSerializer(events, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+
+@csrf_exempt
 def get_locations(request):
     if request.method == 'GET':
         locations = Location.objects.all()
