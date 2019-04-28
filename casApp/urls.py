@@ -8,5 +8,6 @@ urlpatterns = [
     path('events/', views.get_events, name='events'),
     path('allEvents/', views.get_all_events, name='all_events'),
     path('locations/', views.get_locations, name='locations'),
-    path('casas/', views.get_casas, name='casas')
+    path('casas/', views.get_casas, name='casas'),
+    path('student/<str:mat>/', views.student_detail, name='student_detail'),
 ]

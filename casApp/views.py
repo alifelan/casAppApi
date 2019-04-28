@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators. csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from casApp.models import Casa, Event, Location, User
-from casApp.serializers import EventSerializer, LocationSerializer, UserSerializer, CasaSerializer
+from casApp.serializers import EventSerializer, LocationSerializer, UserSerializer, CasaSerializer, GroupSerializer
 from datetime import datetime
 import json
 from django.utils import timezone
@@ -32,6 +32,18 @@ def user(request):
         user = User(name=name, mat=mat, password=password, casa=casa)
         user.save()
         serializer = UserSerializer(user)
+        return JsonResponse(serializer.data, safe=False)
+
+
+def student_detail(request, mat):
+    """Render student details html."""
+    if request.method == 'GET':
+        try:
+            user = User.objects.get(mat=mat)
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'false', 'message': 'User does not exist'}, status=403)
+        groups = user.enrolled_in.all()
+        serializer = GroupSerializer(groups, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 
