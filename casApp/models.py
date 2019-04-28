@@ -21,8 +21,8 @@ class Event(models.Model):
 class Location(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    maps = models.CharField(max_length=100)
-    photo = models.CharField(max_length=100)
+    maps = models.CharField(max_length=400)
+    photo = models.CharField(max_length=400)
 
 
 class User(models.Model):
