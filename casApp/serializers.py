@@ -12,9 +12,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%B/%d/%Y, %H:%M", read_only=True)
+
     class Meta:
         model = Event
-        fields = ('id', 'name', 'description', 'location')
+        fields = ('id', 'name', 'description', 'location', 'date')
 
 
 class LocationSerializer(serializers.ModelSerializer):
