@@ -35,6 +35,7 @@ def user(request):
         return JsonResponse(serializer.data, safe=False)
 
 
+@csrf_exempt
 def student_detail(request, mat):
     """Render student details html."""
     if request.method == 'GET':
