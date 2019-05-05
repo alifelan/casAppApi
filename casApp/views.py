@@ -97,6 +97,28 @@ def add_event(request):
 
 
 @csrf_exempt
+def remove_event(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body.decode("utf-8"))
+            mat = body['mat']
+            event_id = body['event_id']
+        except KeyError:
+            return JsonResponse({'status': 'false', 'message': 'Missing fields'}, status=400)
+        try:
+            user = User.objects.get(mat=mat)
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'false', 'message': 'User does not exist'}, status=404)
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return JsonResponse({'status': 'false', 'message': 'Event does not exist'}, status=404)
+        user.events.remove(event)
+        serializer = UserSerializer(user)
+        return JsonResponse(serializer.data, safe=False)
+
+
+@csrf_exempt
 def get_all_events(request):
     if request.method == 'GET':
         events = Event.objects.all()
