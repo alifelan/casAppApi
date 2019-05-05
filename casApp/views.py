@@ -68,9 +68,31 @@ def login(request):
 @csrf_exempt
 def get_events(request):
     if request.method == 'GET':
-        events = Event.objects.all()
-        serializer = EventSerializer(
-            [event for event in events if event.date >= timezone.now()], many=True)
+        next_events = [event for event in Event.objects.all() if event.date >= timezone.now()]
+        sorted_events = sorted(next_events, key=lambda event: event.date)
+        serializer = EventSerializer(sorted_events, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+
+@csrf_exempt
+def add_event(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body.decode("utf-8"))
+            mat = body['mat']
+            event_id = body['event_id']
+        except KeyError:
+            return JsonResponse({'status': 'false', 'message': 'Missing fields'}, status=400)
+        try:
+            user = User.objects.get(mat=mat)
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'false', 'message': 'User does not exist'}, status=404)
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            return JsonResponse({'status': 'false', 'message': 'Event does not exist'}, status=404)
+        user.events.add(event)
+        serializer = UserSerializer(user)
         return JsonResponse(serializer.data, safe=False)
 
 
@@ -78,7 +100,8 @@ def get_events(request):
 def get_all_events(request):
     if request.method == 'GET':
         events = Event.objects.all()
-        serializer = EventSerializer(events, many=True)
+        sorted_events = sorted(events, key=lambda event: event.date)
+        serializer = EventSerializer(sorted_events, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 

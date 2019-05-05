@@ -10,4 +10,5 @@ urlpatterns = [
     path('locations/', views.get_locations, name='locations'),
     path('casas/', views.get_casas, name='casas'),
     path('student/<str:mat>/', views.student_detail, name='student_detail'),
+    path('addEvent/', views.add_event, name='add_event'),
 ]
