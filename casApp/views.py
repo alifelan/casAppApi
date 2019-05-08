@@ -157,9 +157,8 @@ def add_class(request):
         except User.DoesNotExist:
             return JsonResponse({'status': 'false', 'message': 'User does not exist'}, status=404)
         try:
-            for cl_string in classes:
+            for cl in classes:
                 print(cl_string)
-                cl = json.loads(cl_string)
                 class_json = cl['class_id']
                 class_id = class_json['class_id']
                 class_name = class_json['class_name']
