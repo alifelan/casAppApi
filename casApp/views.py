@@ -154,6 +154,7 @@ def add_class(request):
             return JsonResponse({'status': 'false', 'message': 'Missing fields'}, status=400)
         try:
             user = User.objects.get(mat=mat)
+            user.enrolled_in.all().delete()
         except User.DoesNotExist:
             return JsonResponse({'status': 'false', 'message': 'User does not exist'}, status=404)
         try:
