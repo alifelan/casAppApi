@@ -12,4 +12,5 @@ urlpatterns = [
     path('student/<str:mat>/', views.student_detail, name='student_detail'),
     path('addEvent/', views.add_event, name='add_event'),
     path('removeEvent/', views.remove_event, name='remove_event'),
+    path('addClass/', views.add_class, name='add_class'),
 ]

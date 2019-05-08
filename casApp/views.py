@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators. csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
-from casApp.models import Casa, Event, Location, User
+from casApp.models import Casa, Event, Location, User, Class, Group, Date, Teacher
 from casApp.serializers import EventSerializer, LocationSerializer, UserSerializer, CasaSerializer, GroupSerializer
 from datetime import datetime
 import json
@@ -140,4 +140,60 @@ def get_casas(request):
     if request.method == 'GET':
         casas = Casa.objects.all()
         serializer = CasaSerializer(casas, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+
+@csrf_exempt
+def add_class(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body.decode("utf-8"))
+            mat = body['mat']
+            classes = body['horario']
+        except KeyError:
+            return JsonResponse({'status': 'false', 'message': 'Missing fields'}, status=400)
+        try:
+            user = User.objects.get(mat=mat)
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'false', 'message': 'User does not exist'}, status=404)
+        try:
+            for cl in classes:
+                class_json = cl['class_id']
+                class_id = class_json['class_id']
+                class_name = class_json['class_name']
+                group_number = cl['group_number']
+                try:
+                    current_class = Class.objects.get(class_id=class_id)
+                except ObjectDoesNotExist:
+                    current_class = Class(class_id=class_id, class_name=class_name)
+                    current_class.save()
+                try:
+                    group = Group.objects.get(class_id=current_class, group_number=group_number)
+                except ObjectDoesNotExist:
+                    group = Group(class_id=current_class,
+                                  group_number=group_number, semester='EM2019')
+                    group.save()
+                    teachers = cl['teachers']
+                    for teacher_string in teachers:
+                        try:
+                            teacher = Teacher.objects.get(teacher_name=teacher_string)
+                        except ObjectDoesNotExist:
+                            teacher = Teacher(teacher_name=teacher_string)
+                            teacher.save()
+                        group.teachers.add(teacher)
+                    dates = cl['dates']
+                    days = {'Domingo': 0, 'Lunes': 1, 'Martes': 2,
+                            'Miercoles': 3, 'Jueves': 4, 'Viernes': 5, 'Sabado': 6}
+                    for date_string in dates:
+                        [day, time] = date_string.split(' a las ')
+                        possible_dates = Date.objects.filter(day=days[day])
+                        try:
+                            group.dates.add(
+                                [date for date in possible_dates if str(date) == date_string][0])
+                        except IndexError:
+                            return JsonResponse({'status': 'false', 'message': 'Wrong date format'}, status=400)
+                user.enrolled_in.add(group)
+        except KeyError:
+            return JsonResponse({'status': 'false', 'message': 'Missing fields'}, status=400)
+        serializer = UserSerializer(user)
         return JsonResponse(serializer.data, safe=False)
