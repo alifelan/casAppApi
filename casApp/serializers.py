@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from casApp.models import Casa, Event, Location, User, Group
+from casApp.models import Casa, Event, Location, User, Group, Class
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -31,8 +31,14 @@ class CasaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ClassSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Class
+        fields = '__all__'
+
+
 class GroupSerializer(serializers.ModelSerializer):
-    class_id = serializers.StringRelatedField()
+    class_id = ClassSerializer(read_only=True)
     teachers = serializers.StringRelatedField(many=True)
     dates = serializers.StringRelatedField(many=True)
 
